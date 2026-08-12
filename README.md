@@ -1,8 +1,8 @@
 # Kubernetes End‑to‑End on AWS EKS 
 
-**Demo summary**  
+****Demo summary**  
 This repo documents an end‑to‑end demo that provisions an Amazon EKS cluster, configures IAM/OIDC for the AWS Load Balancer Controller, deploys the 2048 sample app on Fargate, exposes it via Ingress backed by an ALB, verifies the deployment, and cleans up resources. 
----
+
 
 ## Prerequisites (what you need before starting)
 
@@ -29,7 +29,7 @@ This repo documents an end‑to‑end demo that provisions an Amazon EKS cluster
 
 ## Step‑by‑step commands 
 
-> **Run from Ubuntu / WSL2** (recommended). Replace `<ACCOUNT_ID>`, `<REGION>`, `<VPC_ID>` as needed.
+> Run from Ubuntu / WSL2** (recommended). Replace `<ACCOUNT_ID>`, `<REGION>`, `<VPC_ID>` as needed.
 
 
 
@@ -39,7 +39,7 @@ This repo documents an end‑to‑end demo that provisions an Amazon EKS cluster
 2. Create EKS cluster
 bash
 eksctl create cluster --name demo-cluster --region us-east-1 --nodes 2 --node-type t3.micro
-# or create a Fargate-only cluster if you prefer serverless pods
+#create a Fargate-only cluster if you prefer serverless pods
 
 3. Create a Fargate profile (optional — used in demo)
 bash
@@ -53,11 +53,11 @@ This ensures pods in game-2048 run on Fargate.
 4. Deploy sample app (Ingress + Service + Deployment)
 bash
 kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.4/docs/examples/2048/2048_full.yaml
-# output: namespace/game-2048 created, deployment/service/ingress created
+#output: namespace/game-2048 created, deployment/service/ingress created
 5. Check Ingress address (initially may be empty)
 bash
 kubectl get ingress -n game-2048
-# If ADDRESS is empty, the ALB controller is not yet ready or lacks permissions
+#If ADDRESS is empty, the ALB controller is not yet ready or lacks permissions
 6. If no ADDRESS, ensure controller has permissions (OIDC + IAM policy + service account)
 a) Associate OIDC provider (creates OIDC for IRSA)
 bash
@@ -88,7 +88,7 @@ aws iam create-policy \
 }
 
 d) Create IAM service account (IRSA)
-bash
+
 eksctl create iamserviceaccount \
   --cluster=demo-cluster \
   --namespace=kube-system \
@@ -120,16 +120,15 @@ Wait until READY shows 2/2 and pods are Running.
 9. Re-check Ingress and ALB address
 bash
 kubectl get ingress -n game-2048
-# ADDRESS should now show an ALB DNS like:
-# k8s-game2048-ingress2-xxxxxxxxxx.us-east-1.elb.amazonaws.com
+#ADDRESS should now show an ALB DNS like:
+k8s-game2048-ingress2-xxxxxxxxxx.us-east-1.elb.amazonaws.com
 10. Test the app
 bash
-curl -I http://<ALB_DNS>
-# or open http://<ALB_DNS> in a browser to see the 2048 app UI
+open http://<ALB_DNS> in a browser to see the 2048 app UI
 
 
 
-Troubleshooting (common issues and fixes)
+**Troubleshooting (common issues and fixes)**
 Ingress ADDRESS remains empty
 
 Ensure the AWS Load Balancer Controller pods are Running and Ready.
@@ -140,10 +139,10 @@ Confirm vpcId and region values passed to Helm are correct.
 
 
 
-Cleanup 
-bash
+Cleanup **
+**
 eksctl delete cluster --name demo-cluster --region us-east-1
-# Also delete any IAM policies you created if not needed:
+#Also delete any IAM policies you created if not needed:
 aws iam delete-policy --policy-arn arn:aws:iam::<ACCOUNT_ID>:policy/AWSLoadBalancerControllerIAMPolicy
 
 
