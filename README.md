@@ -31,8 +31,8 @@ This repo documents an end‑to‑end demo that provisions an Amazon EKS cluster
 
 > **Run from Ubuntu / WSL2** (recommended). Replace `<ACCOUNT_ID>`, `<REGION>`, `<VPC_ID>` as needed.
 
-### 1. Configure AWS CLI
-```bash
+
+
 1.aws configure
 # enter Access Key ID, Secret Access Key, default region (e.g., us-east-1), output json
 
