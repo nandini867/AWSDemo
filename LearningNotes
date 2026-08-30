@@ -1,0 +1,83 @@
+🚀 Argo CD + Minikube Learning Notes
+1. Accessing Argo CD UI
+NodePort access:
+
+Example: http://192.168.49.2:31466 (Minikube VM IP + NodePort).
+
+May fail if host cannot route into Minikube VM network.
+
+Tunnel access (recommended):
+
+Run minikube tunnel.
+
+Access via http://127.0.0.1:<random-port> (localhost).
+
+More reliable for local dev.
+
+2. Installing Argo CD CLI in WSL
+Check architecture:
+
+bash
+uname -m   # usually x86_64 → use amd64 binary
+Download CLI:
+
+bash
+curl -L -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+chmod +x argocd
+sudo mv argocd /usr/local/bin/argocd
+Verify:
+
+bash
+argocd version
+3. Logging in via CLI
+Use tunnel port:
+
+bash
+argocd login 127.0.0.1:45401
+Username: admin
+
+Password:
+
+bash
+kubectl -n argocd get secret argocd-initial-admin-secret \
+  -o jsonpath="{.data.password}" | base64 -d
+4. Creating an Application from GitHub Repo
+Example: Guestbook app from repo nandini867/argocd-example-apps
+
+bash
+argocd app create guestbook \
+  --repo https://github.com/nandini867/argocd-example-apps.git \
+  --path guestbook \
+  --dest-server https://kubernetes.default.svc \
+  --dest-namespace default
+Sync manually:
+
+bash
+argocd app sync guestbook
+Check status:
+
+bash
+argocd app get guestbook
+5. Enabling Automatic Sync
+Enable auto‑sync:
+
+bash
+argocd app set guestbook --sync-policy automated
+Optional flags:
+
+--self-heal → auto‑correct drift if cluster changes.
+
+--auto-prune → delete resources removed from Git.
+
+Example:
+
+bash
+argocd app set guestbook --sync-policy automated --self-heal --auto-prune
+6. Key Takeaways
+NodePort vs Tunnel: Tunnel is easier for local browser access.
+
+CLI install: Always use curl -L to follow redirects.
+
+Name collisions: Keep CLI binary separate from server pods.
+
+GitOps workflow: Repo + path → Argo CD app → sync → auto‑sync.
